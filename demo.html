@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07040b">
+<title>BOO! Party Night · Check-in</title>
+<link rel="preload" href="frames/base.png" as="image">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Kanit:wght@300;400;600&family=Mitr:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--c1:#ff7a18;--c2:#8a3ffc;--rc:#ff7a18;--gold:#f3c969;--text:#f5eedd}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#07040b;color:var(--text);font-family:Kanit,sans-serif;overflow-x:hidden}
+button,input{font-family:inherit}
+
+/* ---------- บรรยากาศ ---------- */
+.sky{position:fixed;inset:0;z-index:0;background:radial-gradient(120% 70% at 50% -10%,color-mix(in srgb,var(--c2) 55%,#000),#07040b 70%)}
+.moon{position:fixed;top:5vh;right:-50px;width:190px;height:190px;border-radius:50%;z-index:0;opacity:.85;
+  background:radial-gradient(circle at 35% 35%,#fff8e1,#f3d9a4 55%,#c9a46a);
+  box-shadow:0 0 60px #fff3,0 0 160px color-mix(in srgb,var(--c1) 45%,transparent)}
+.fog{position:fixed;left:-50%;width:200%;height:45vh;bottom:-10vh;z-index:1;pointer-events:none;
+  background:radial-gradient(closest-side,#ffffff16,transparent) 0 0/40% 100% repeat-x;filter:blur(18px);animation:fog 40s linear infinite}
+.fog.f2{bottom:-18vh;opacity:.7;animation-duration:65s;animation-direction:reverse}
+@keyframes fog{to{transform:translateX(25%)}}
+#fx{position:fixed;inset:0;z-index:2;pointer-events:none}
+.bat{position:fixed;top:0;left:0;z-index:2;width:46px;fill:#0b0610;pointer-events:none;
+  filter:drop-shadow(0 0 6px color-mix(in srgb,var(--c1) 60%,transparent));animation:fly 16s linear infinite}
+.bat.b2{width:30px;animation-duration:21s;animation-delay:-6s}
+.bat.b3{width:38px;animation-duration:27s;animation-delay:-12s}
+.bat path{transform-origin:50% 50%;animation:flap .22s ease-in-out infinite alternate}
+@keyframes flap{to{transform:scaleY(.45)}}
+@keyframes fly{0%{transform:translate(-15vw,30vh)}25%{transform:translate(25vw,12vh) scale(.8)}50%{transform:translate(60vw,26vh) scale(1.1)}75%{transform:translate(85vw,8vh) scale(.7)}100%{transform:translate(115vw,20vh)}}
+#flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:50}
+#flash.go{animation:flash .7s ease-out}
+@keyframes flash{from{opacity:.95}to{opacity:0}}
+.demo{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:40;padding:6px 14px;border-radius:99px;white-space:nowrap;
+  background:#ff7a18;color:#1a0d00;font:600 13px Kanit;box-shadow:0 0 18px #ff7a1899}
+
+/* ---------- โครงหน้า ---------- */
+.app{position:relative;z-index:3;max-width:460px;margin:0 auto;padding:max(30px,env(safe-area-inset-top)) 18px 48px;min-height:100dvh}
+.screen{display:none}
+.screen.active{display:block;animation:enter .7s cubic-bezier(.2,.8,.2,1)}
+@keyframes enter{from{opacity:0;filter:blur(10px);transform:scale(.97)}}
+.title{font:400 clamp(44px,13vw,64px)/1 Creepster,cursive;text-align:center;color:var(--c1);letter-spacing:2px;margin:.3em 0 .15em;
+  text-shadow:0 0 18px var(--c1),0 0 48px color-mix(in srgb,var(--c1) 50%,transparent);animation:flicker 5s infinite}
+@keyframes flicker{0%,18%,22%,62%,64%,100%{opacity:1}20%,63%{opacity:.35}}
+.sub{font:500 17px Mitr;text-align:center;color:var(--gold);margin:0 0 22px}
+.glass{background:linear-gradient(160deg,rgba(40,18,60,.65),rgba(12,6,20,.78));border:1px solid color-mix(in srgb,var(--c1) 35%,transparent);
+  border-radius:22px;padding:22px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 20px 60px #000a,0 0 40px color-mix(in srgb,var(--c2) 35%,transparent)}
+label.f{display:block;margin:16px 0 6px;color:var(--gold);font-size:15px}
+input[type=text]{width:100%;padding:15px 16px;border-radius:14px;border:1px solid #ffffff22;background:#0b0612cc;color:#fff;font-size:18px;outline:none;transition:.25s}
+input[type=text]:focus{border-color:var(--c1);box-shadow:0 0 0 4px color-mix(in srgb,var(--c1) 25%,transparent),0 0 24px color-mix(in srgb,var(--c1) 40%,transparent)}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin-top:18px;line-height:1.5;opacity:.9}
+.consent input{width:20px;height:20px;accent-color:var(--c1);flex:none;margin-top:2px}
+.btn{position:relative;overflow:hidden;display:block;width:100%;margin-top:16px;padding:16px;border:0;border-radius:16px;
+  font:600 19px Kanit;color:#1a0d00;text-align:center;text-decoration:none;cursor:pointer;
+  background:linear-gradient(180deg,#ffd27a,var(--c1));
+  box-shadow:0 6px 0 color-mix(in srgb,var(--c1) 45%,#000),0 10px 30px color-mix(in srgb,var(--c1) 45%,transparent);transition:transform .1s}
+.btn:active{transform:translateY(4px)}
+.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,#fff8 50%,transparent 70%);transform:translateX(-100%);animation:shine 3s infinite}
+@keyframes shine{60%,100%{transform:translateX(100%)}}
+.btn:disabled{opacity:.45}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid #ffffff2a;box-shadow:none}
+.btn.ghost::after{display:none}
+.err{color:#ff8a8a;margin-top:12px;min-height:1.3em;text-align:center}
+.hint{font-size:13px;opacity:.7;text-align:center;margin:10px 0 0}
+.hidden{display:none!important}
+@keyframes pulse{50%{opacity:.45;transform:scale(.97)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- กล้อง ---------- */
+.cam{position:relative;border-radius:24px;overflow:hidden;aspect-ratio:3/4;background:#000;
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--c1) 50%,transparent),0 0 50px color-mix(in srgb,var(--c1) 35%,transparent)}
+.cam video,.cam img{width:100%;height:100%;object-fit:cover;display:block}
+.cam video{transform:scaleX(-1)}
+.guide{position:absolute;inset:8% 17% 24%;border-radius:50%;border:2px solid color-mix(in srgb,var(--c1) 80%,transparent);
+  box-shadow:0 0 0 999px #0007,inset 0 0 30px var(--c1);animation:breathe 2.4s ease-in-out infinite;pointer-events:none}
+@keyframes breathe{50%{transform:scale(1.03);opacity:.7}}
+.scan{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--c1),transparent);box-shadow:0 0 18px var(--c1);animation:scan 2.6s linear infinite}
+@keyframes scan{from{top:0}to{top:100%}}
+.cam.shot .guide,.cam.shot .scan{display:none}
+.count{position:absolute;inset:0;display:grid;place-items:center;font:130px Creepster;color:#fff;text-shadow:0 0 30px var(--c1);pointer-events:none;opacity:0}
+.count.pop{animation:pop .8s ease-out}
+@keyframes pop{from{transform:scale(2);opacity:0}30%{opacity:1}to{transform:scale(.8);opacity:0}}
+
+/* ---------- พิธีอัญเชิญ ---------- */
+#s-summon{text-align:center;padding-top:5vh}
+.ritual{position:relative;width:min(78vw,320px);aspect-ratio:1;margin:0 auto}
+.ring{position:absolute;inset:0;border-radius:50%;border:2px solid color-mix(in srgb,var(--c1) 70%,transparent);border-top-color:var(--gold);
+  box-shadow:0 0 30px color-mix(in srgb,var(--c1) 50%,transparent),inset 0 0 30px color-mix(in srgb,var(--c1) 30%,transparent);animation:spin 9s linear infinite}
+.ring.r2{inset:12%;border-style:dashed;animation-duration:6s;animation-direction:reverse}
+.ring.r3{inset:24%;border-width:1px;border-color:var(--gold);animation-duration:3.5s}
+.runes{position:absolute;inset:0;width:100%;height:100%;animation:spin 22s linear infinite reverse;fill:var(--gold);font-size:12px;letter-spacing:5px;opacity:.85}
+.soul{position:absolute;inset:32%;border-radius:50%;overflow:hidden;box-shadow:0 0 40px var(--c1);animation:pulse 1.4s infinite}
+.soul img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.25) brightness(.8)}
+.roll{font:700 clamp(30px,9vw,44px) Mitr;margin-top:28px;color:#fff;text-shadow:0 0 20px var(--c1);min-height:1.4em}
+.shake .app{animation:shake .6s}
+@keyframes shake{10%,90%{transform:translate(-2px,1px)}20%,80%{transform:translate(4px,-2px)}30%,50%,70%{transform:translate(-7px,3px)}40%,60%{transform:translate(7px,-3px)}}
+
+/* ---------- เปิดการ์ด ---------- */
+#s-result{text-align:center}
+.kicker{margin:0;font:500 16px Mitr;color:var(--gold);letter-spacing:1px}
+.resname{margin:.1em 0 .2em;font:700 clamp(30px,9vw,42px) Mitr;color:#fff;text-shadow:0 0 22px var(--rc)}
+.rarity{display:inline-block;padding:5px 16px;border-radius:99px;font:700 14px Mitr;letter-spacing:2px;color:#140a00;background:var(--rc);box-shadow:0 0 22px var(--rc)}
+.stage{position:relative;display:flex;justify-content:center;padding:26px 0 10px;perspective:1200px}
+.rays{position:absolute;left:50%;top:50%;width:150vmax;height:150vmax;margin:-75vmax 0 0 -75vmax;z-index:-1;pointer-events:none;opacity:0;transition:opacity 1.2s;
+  background:repeating-conic-gradient(color-mix(in srgb,var(--rc) 40%,transparent) 0 5deg,transparent 5deg 15deg);
+  -webkit-mask-image:radial-gradient(circle,#000,transparent 45%);mask-image:radial-gradient(circle,#000,transparent 45%);animation:spin 30s linear infinite}
+.stage.revealed .rays{opacity:1}
+.floater{animation:float 5s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+.card3d{width:min(78vw,340px);aspect-ratio:760/1125;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transform-style:preserve-3d;transition:transform .2s ease-out}
+.flip{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 0.8s cubic-bezier(.3,1.4,.4,1);cursor:pointer}
+.flip.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:18px;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.front{transform:rotateY(180deg);box-shadow:0 0 50px color-mix(in srgb,var(--rc) 70%,transparent),0 30px 60px #000}
+.r-legendary .front{animation:legend 2s ease-in-out infinite}
+@keyframes legend{50%{box-shadow:0 0 110px var(--rc),0 30px 60px #000}}
+.front img{width:100%;height:100%;display:block}
+.holo,.glare{position:absolute;inset:0;pointer-events:none}
+.holo{background:linear-gradient(115deg,transparent 25%,#ff00aa55 38%,#00ffff55 48%,#ffff0055 58%,transparent 72%);
+  background-size:260% 260%;background-position:var(--px,50%) var(--py,50%);mix-blend-mode:color-dodge;opacity:0;transition:opacity .8s}
+.r-rare .holo{opacity:.2}.r-epic .holo{opacity:.4}.r-legendary .holo{opacity:.65}
+.glare{background:radial-gradient(circle at var(--px,50%) var(--py,50%),#fff6,transparent 45%);mix-blend-mode:overlay}
+
+/* หลังการ์ดสุดอลังการ ดีไซน์การ์ดเกมพรีเมียม */
+.back{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;border:3px solid var(--gold);
+  background:var(--back-bg, radial-gradient(circle at 50% 45%,#3d1763,#12061d 80%));
+  box-shadow:inset 0 0 50px var(--back-glow,#a05ffd88),0 30px 60px #000}
+.back-frame-outer{position:absolute;inset:8px;border:2px solid rgba(243,201,105,0.4);border-radius:12px;pointer-events:none}
+.back-frame-inner{position:absolute;inset:14px;border:1px dashed rgba(243,201,105,0.25);border-radius:10px;pointer-events:none}
+.back-corner{position:absolute;width:18px;height:18px;border-color:var(--gold);border-style:solid;pointer-events:none}
+.bc-tl{top:12px;left:12px;border-width:2px 0 0 2px}
+.bc-tr{top:12px;right:12px;border-width:2px 2px 0 0}
+.bc-bl{bottom:12px;left:12px;border-width:0 0 2px 2px}
+.bc-br{bottom:12px;right:12px;border-width:0 2px 2px 0}
+
+.back-sigil-wrap{position:relative;width:150px;height:150px;display:grid;place-items:center}
+.back-ring{position:absolute;inset:0;border:2px dashed rgba(243,201,105,0.6);border-radius:50%;animation:spin 15s linear infinite}
+.back-ring-2{position:absolute;inset:12px;border:1px solid rgba(255,122,24,0.5);border-radius:50%;animation:spin 10s linear infinite reverse}
+.back-core{width:100px;height:100px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle,rgba(255,122,24,0.3) 0%,rgba(15,5,30,0.8) 70%);
+  border:2px solid var(--gold);box-shadow:0 0 25px var(--c1),inset 0 0 15px var(--c1);animation:pulse 2s infinite}
+.back-core span{font-size:46px;filter:drop-shadow(0 0 10px var(--gold))}
+
+.back-title{font:32px Creepster,cursive;letter-spacing:4px;color:var(--gold);margin:0;text-shadow:0 0 15px var(--c1),0 2px 5px #000}
+.back-sub{font:12px Mitr,sans-serif;letter-spacing:3px;color:rgba(255,255,255,0.6);text-transform:uppercase;margin:0}
+
+.taphint{position:absolute;bottom:10px;left:0;right:0;font:500 15px Mitr;color:var(--gold);opacity:0;transition:.4s;background:#0008;padding:4px}
+.taphint.show{opacity:1;animation:pulse 1.4s infinite}
+.statwrap{margin-top:2px;opacity:0;transform:translateY(16px);transition:.7s}
+.statwrap.show{opacity:1;transform:none}
+.lv{font:700 20px Mitr;color:var(--gold)}
+.lv b{font-size:32px;color:#fff;text-shadow:0 0 14px var(--rc)}
+.stats{display:grid;gap:8px;margin-top:8px}
+.st{display:grid;grid-template-columns:38px 1fr 44px;align-items:center;gap:10px;font:700 14px Mitr}
+.bar{height:9px;border-radius:9px;background:#ffffff14;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,color-mix(in srgb,var(--bc) 55%,#000),var(--bc));
+  box-shadow:0 0 12px var(--bc);transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.stats.on .bar i{width:var(--w)}
+@media (prefers-reduced-motion:reduce){.fog,.bat,.rays,.floater,.title{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="sky"></div><div class="moon"></div>
+<div class="fog"></div><div class="fog f2"></div>
+<svg class="bat" viewBox="0 0 64 24"><path d="M32 8C29 2 26 2 25 6 20 0 10-1 0 3c6 2 9 6 9 12 4-3 9-2 12 2 2-3 6-3 11 2 5-5 9-5 11-2 3-4 8-5 12-2 0-6 3-10 9-12-10-4-20-3-25 3-1-4-4-4-7 2z"/></svg>
+<svg class="bat b2" viewBox="0 0 64 24"><path d="M32 8C29 2 26 2 25 6 20 0 10-1 0 3c6 2 9 6 9 12 4-3 9-2 12 2 2-3 6-3 11 2 5-5 9-5 11-2 3-4 8-5 12-2 0-6 3-10 9-12-10-4-20-3-25 3-1-4-4-4-7 2z"/></svg>
+<svg class="bat b3" viewBox="0 0 64 24"><path d="M32 8C29 2 26 2 25 6 20 0 10-1 0 3c6 2 9 6 9 12 4-3 9-2 12 2 2-3 6-3 11 2 5-5 9-5 11-2 3-4 8-5 12-2 0-6 3-10 9-12-10-4-20-3-25 3-1-4-4-4-7 2z"/></svg>
+<canvas id="fx"></canvas>
+<div id="flash"></div>
+<div id="demoBadge" class="demo hidden">โหมดทดลอง · ไม่บันทึกข้อมูลจริง</div>
+
+<div class="app">
+  <!-- 1. ลงทะเบียน -->
+  <section id="s-form" class="screen active">
+    <h1 class="title">BOO!<br>Party Night</h1>
+    <p class="sub">ลงทะเบียนเข้างาน · ปลุกวิญญาณประจำตัวคุณ</p>
+    <div class="glass">
+      <label class="f" for="name">ชื่อ - นามสกุล</label>
+      <input id="name" type="text" maxlength="40" autocomplete="name" placeholder="เช่น สมชาย ใจดี">
+      <label class="f" for="empId">รหัสพนักงาน</label>
+      <input id="empId" type="text" maxlength="20" autocapitalize="characters" placeholder="เช่น 4022">
+      <label class="consent"><input id="consent" type="checkbox">
+        <span>ยินยอมให้บริษัทใช้ภาพถ่ายของฉันเพื่อสร้างการ์ดตัวละคร และใช้ภายในงานนี้เท่านั้น</span></label>
+      <button id="btnNext" class="btn">ทำสัญญากับวิญญาณ</button>
+      <div id="formErr" class="err"></div>
+    </div>
+  </section>
+
+  <!-- 2. ถ่ายรูป -->
+  <section id="s-camera" class="screen">
+    <h2 class="title" style="font-size:48px">Say Boo!</h2>
+    <p class="sub">ให้ใบหน้าอยู่ในวงรี แสงสว่างพอ ถอดแว่นดำ/หน้ากาก</p>
+    <div id="cam" class="cam">
+      <video id="video" playsinline muted></video>
+      <img id="preview" class="hidden" alt="">
+      <div class="guide"></div><div class="scan"></div>
+      <div id="count" class="count"></div>
+    </div>
+    <button id="btnShot" class="btn">ถ่ายรูป</button>
+    <button id="btnUse" class="btn hidden">ใช้รูปนี้ อัญเชิญวิญญาณเลย!</button>
+    <button id="btnRetake" class="btn ghost hidden">ถ่ายใหม่</button>
+    <label class="btn ghost">เปิดกล้องไม่ได้? ใช้แอปกล้อง / เลือกรูป
+      <input id="fileInput" type="file" accept="image/*" capture="user" hidden></label>
+    <button id="btnSkip" class="btn ghost hidden">ข้ามการถ่ายรูป (ใช้ภาพตัวอย่าง)</button>
+    <div id="camErr" class="err"></div>
+  </section>
+
+  <!-- 3. พิธีอัญเชิญ -->
+  <section id="s-summon" class="screen">
+    <div class="ritual">
+      <div class="ring"></div><div class="ring r2"></div><div class="ring r3"></div>
+      <svg class="runes" viewBox="0 0 200 200"><defs><path id="cp" d="M100,100 m-84,0 a84,84 0 1,1 168,0 a84,84 0 1,1 -168,0"/></defs>
+        <text><textPath href="#cp">✦ ☾ ✧ ◈ ✶ ☽ ✦ ✧ ◈ ✶ ☾ ✦ ✧ ◈ ✶ ☽ ✦ ✧ ◈ ✶ ☾ ✦ ✧ ◈</textPath></text></svg>
+      <div class="soul"><img id="soulImg" alt=""></div>
+    </div>
+    <div id="roll" class="roll">???</div>
+    <p id="rollSub" class="hint">กำลังอัญเชิญวิญญาณ...</p>
+    <p class="hint">ใช้เวลาประมาณ 15-30 วินาที อย่าปิดหน้านี้</p>
+  </section>
+
+  <!-- 4. เปิดการ์ด -->
+  <section id="s-result" class="screen">
+    <p id="resTitle" class="kicker">วิญญาณของคุณคือ...</p>
+    <h1 id="resName" class="resname">???</h1>
+    <div id="rarity" class="rarity hidden"></div>
+    <div id="stage" class="stage">
+      <div class="rays"></div>
+      <div class="floater"><div id="card3d" class="card3d">
+        <div id="flip" class="flip">
+          <!-- หลังการ์ดดีไซน์อลังการ -->
+          <div id="cardBackFace" class="face back">
+            <div class="back-frame-outer"></div>
+            <div class="back-frame-inner"></div>
+            <div class="back-corner bc-tl"></div><div class="back-corner bc-tr"></div>
+            <div class="back-corner bc-bl"></div><div class="back-corner bc-br"></div>
+            <div class="back-sigil-wrap">
+              <div class="back-ring"></div>
+              <div class="back-ring-2"></div>
+              <div class="back-core"><span id="backIcon">🎃</span></div>
+            </div>
+            <h2 class="back-title">BOO!</h2>
+            <p class="back-sub">Party Night Official Card</p>
+          </div>
+          <div class="face front"><img id="cardFront" alt="การ์ดของคุณ"><div class="holo"></div><div class="glare"></div></div>
+        </div>
+      </div></div>
+      <div id="tapHint" class="taphint">แตะการ์ดเพื่อพลิกดูหลัง/หน้า</div>
+    </div>
+    <div id="statWrap" class="statwrap">
+      <div class="lv">LV <b id="lvNum">0</b></div>
+      <div id="stats" class="stats"></div>
+    </div>
+    <a id="btnDownload" class="btn" href="#" download>ดาวน์โหลดการ์ด</a>
+    <button id="btnShare" class="btn ghost hidden">แชร์</button>
+    <button id="btnAgain" class="btn ghost hidden">ลองสุ่มใหม่อีกครั้ง (โหมดทดลอง)</button>
+    <p id="saveStatus" class="hint"></p>
+    <p class="hint">iPhone: กดดาวน์โหลดแล้วเลือก "บันทึกภาพ" · ถ้าเปิดผ่าน LINE ให้เปิดใน Safari/Chrome ก่อน</p>
+  </section>
+</div>
+
+<script>
+/******** CONFIG ********/
+const API_URL = 'https://script.google.com/macros/s/XXXXXXXX/exec';
+const QS = new URLSearchParams(location.search);
+const EVENT_CODE = QS.get('c') || '';
+const DEBUG = QS.has('debug');
+const DEMO = QS.has('demo') || API_URL.includes('XXXXXXXX');
+const DEMO_USER = { name: QS.get('name') || 'เกวลิน ทรัพย์เอนก', empId: QS.get('emp') || '4022' };
+
+const L = {
+  card:   { x:.052, y:.047, w:.897, h:.890, r:.03 },
+  photo:  { x:.18,  y:.14,  w:.65,  h:.45 },
+  ribbon: { cx:.501, cy:.609, maxW:.30, size:.03 },
+  parch:  { cx:.43, maxW:.48, descW:.44, y:[.69,.73,.77] },
+  lv:     { x:.83, y:.252, maxW:.2, size:.045 },
+  stats:  { x:.875, ys:[.633,.703,.779,.853], maxW:.1, size:.034 }
+};
+
+const THEMES = {
+  classic:      { c1:'#ff7a18', c2:'#8a3ffc', p:'ember', icon:'🎃', bg:'radial-gradient(circle at 50% 45%,#4a1c75,#12061d 85%)', glow:'#9a4ffc99' },
+  thai_village: { c1:'#6dffb0', c2:'#0e4d33', p:'wisp',  icon:'🌿', bg:'radial-gradient(circle at 50% 45%,#155234,#05170e 85%)', glow:'#32b87099' },
+  thai_temple:  { c1:'#ffd36b', c2:'#7a0f22', p:'ember', icon:'🔥', bg:'radial-gradient(circle at 50% 45%,#751622,#1a0305 85%)', glow:'#e0314899' },
+  hospital:     { c1:'#8ff3ff', c2:'#12424d', p:'dust',  icon:'🏥', bg:'radial-gradient(circle at 50% 45%,#144a59,#041114 85%)', glow:'#35c2e099' },
+  gothic:       { c1:'#ff2d55', c2:'#4a0016', p:'petal', icon:'🦇', bg:'radial-gradient(circle at 50% 45%,#701027,#120104 85%)', glow:'#e0225099' },
+  undead:       { c1:'#b6ff3b', c2:'#1e3a05', p:'wisp',  icon:'💀', bg:'radial-gradient(circle at 50% 45%,#356118,#091403 85%)', glow:'#84d63b99' },
+  horror_movie: { c1:'#ff3b3b', c2:'#2a0000', p:'dust',  icon:'🔪', bg:'radial-gradient(circle at 50% 45%,#631818,#0f0303 85%)', glow:'#e0363699' },
+  asian:        { c1:'#ff5a3c', c2:'#5a0a0a', p:'petal', icon:'🏮', bg:'radial-gradient(circle at 50% 45%,#801f1f,#140303 85%)', glow:'#f04d4d99' },
+  afterhours:   { c1:'#d4ff8a', c2:'#23301a', p:'dust',  icon:'📦', bg:'radial-gradient(circle at 50% 45%,#3b4f2e,#0d120a 85%)', glow:'#99cc6699' }
+};
+
+const RAR = {
+  COMMON:    { label:'COMMON',    stars:1, color:'#c9ced6', ink:'#5a5f66' },
+  RARE:      { label:'RARE',      stars:2, color:'#4da3ff', ink:'#1f5fbf' },
+  EPIC:      { label:'EPIC',      stars:3, color:'#c76bff', ink:'#7a2bbf' },
+  LEGENDARY: { label:'LEGENDARY', stars:4, color:'#ffcf3f', ink:'#a86f00' }
+};
+
+/******** UTIL ********/
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const state = { name:'', empId:'', photo:null, names:[] };
+let stream = null, tiltOK = false;
+function show(id){ document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id)); scrollTo(0,0); }
+async function api(payload){
+  if(DEMO) return demoApi(payload);
+  const r = await fetch(API_URL, { method:'POST', body: JSON.stringify({ ...payload, code: EVENT_CODE }) });
+  const j = await r.json(); if(!j.ok) throw new Error(j.error); return j;
+}
+const loadImg = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+function mk(w, h){ const c = document.createElement('canvas'); c.width = Math.round(w); c.height = Math.round(h); return c; }
+function flash(){ const f = $('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); }
+const buzz = p => navigator.vibrate && navigator.vibrate(p);
+
+/******** โหมดทดลอง ********/
+const DEMO_CHARS = [
+  ['จิ้งจอกเก้าหาง','asian','เก้าหางเรืองแสงในคืนเดือนมืด ใครเห็นเป็นต้องหลงมนต์'],
+  ['แวมไพร์','gothic','สง่างามในเงามืด จิบกาแฟดำแทนอาหารเย็นทุกคืน'],
+  ['นางตานี','thai_village','ใต้ต้นกล้วยมีรอยยิ้มหวาน แต่อย่าเผลอหันกลับไปมอง'],
+  ['กุมารทอง','thai_temple','ทองคำเปล่งประกาย คุ้มครองทุกคนที่ยิ้มให้'],
+  ['พยาบาล','hospital','เดินตรวจวอร์ดตอนตีสาม ทั้งที่ตึกนี้ปิดไปนานแล้ว'],
+  ['ซอมบี้','undead','ช้าแต่ชัวร์ ตามหาพัสดุได้ครบทุกกล่อง']
+];
+const RARITY_TABLE = [['COMMON',55,[5,29],[20,60]],['RARE',28,[30,59],[40,80]],['EPIC',13,[60,84],[60,95]],['LEGENDARY',4,[85,99],[85,100]]];
+function rollStats(force){
+  const rnd = (a, b) => a + Math.floor(Math.random()*(b - a + 1));
+  let t = RARITY_TABLE.find(r => r[0] === String(force || '').toUpperCase());
+  if(!t){ const x = Math.random()*100; let acc = 0; t = RARITY_TABLE.find(r => (acc += r[1]) > x) || RARITY_TABLE[0]; }
+  const s = () => rnd(t[3][0], t[3][1]);
+  return { rarity:t[0], lv:rnd(t[2][0], t[2][1]), hp:s(), mp:s(), df:s(), it:s() };
+}
+async function demoApi(p){
+  if(p.action === 'check'){ await sleep(400); return { ok:true, registered:false, names: DEMO_CHARS.map(c => c[0]) }; }
+  if(p.action === 'generate'){
+    await sleep(3500);
+    const c = DEMO_CHARS[Math.floor(Math.random()*DEMO_CHARS.length)];
+    const ai = await demoSpooky(state.photo, c[1]);
+    return { ok:true, aiMime:'image/jpeg', aiImage: ai.split(',')[1],
+      card: { empId:state.empId, name:state.name, charId:0, charName:c[0], theme:c[1], description:c[2], ...rollStats(QS.get('rarity')) } };
+  }
+  if(p.action === 'saveCard'){ await sleep(500); return { ok:true, saved:true }; }
+  throw new Error('unknown action');
+}
+async function demoSpooky(photoUrl, theme){
+  const img = await loadImg(photoUrl), c = mk(768, 1024), g = c.getContext('2d'), t = THEMES[theme] || THEMES.classic;
+  g.filter = 'contrast(1.15) saturate(.8)'; g.drawImage(img, 0, 0, 768, 1024); g.filter = 'none';
+  g.globalCompositeOperation = 'soft-light'; g.globalAlpha = .6; g.fillStyle = t.c1; g.fillRect(0, 0, 768, 1024);
+  g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  const v = g.createRadialGradient(384, 430, 180, 384, 512, 640);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(10,0,20,.88)'); g.fillStyle = v; g.fillRect(0, 0, 768, 1024);
+  return c.toDataURL('image/jpeg', .9);
+}
+function demoSilhouette(){
+  const c = mk(768, 1024), g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 1024);
+  gr.addColorStop(0, '#6b4a8a'); gr.addColorStop(1, '#1a0d26'); g.fillStyle = gr; g.fillRect(0, 0, 768, 1024);
+  g.fillStyle = '#0d0614'; g.beginPath(); g.ellipse(384, 400, 150, 190, 0, 0, 7); g.fill();
+  g.beginPath(); g.ellipse(384, 1010, 330, 310, 0, 0, 7); g.fill();
+  return c.toDataURL('image/jpeg', .9);
+}
+
+/******** ตรวจสอบและวาดโลโก้ให้ตรงต้นฉบับจริง ********/
+function drawLogos(g, W, H){
+  // 1. THE BRAVO (ซ้ายบน) - วงกลมแดงขอบทอง มงกุฎ และตัวหนังสือโค้ง
+  const cx1 = .165*W, cy1 = .115*H, r1 = .085*W;
+  g.save();
+  g.fillStyle = '#b31212'; g.beginPath(); g.arc(cx1, cy1, r1, 0, Math.PI*2); g.fill();
+  g.lineWidth = 3.5; g.strokeStyle = '#f3c969'; g.stroke();
+  g.fillStyle = '#fff'; g.font = `700 ${r1*.34}px Mitr, sans-serif`; g.textAlign = 'center';
+  g.fillText('THE BRAVO', cx1, cy1 + r1*.22);
+  g.font = `500 ${r1*.2}px Kanit, sans-serif`; g.fillStyle = '#f3c969';
+  g.fillText('ด้วยราชวิล', cx1, cy1 + r1*.55);
+  // มงกุฎทองสามแฉก
+  g.fillStyle = '#f3c969';
+  g.beginPath(); g.moveTo(cx1-r1*.32, cy1-r1*.05); g.lineTo(cx1-r1*.22, cy1-r1*.38); g.lineTo(cx1-r1*.08, cy1-r1*.18); g.lineTo(cx1, cy1-r1*.42); g.lineTo(cx1+r1*.08, cy1-r1*.18); g.lineTo(cx1+r1*.22, cy1-r1*.38); g.lineTo(cx1+r1*.32, cy1-r1*.05); g.closePath(); g.fill();
+  g.restore();
+
+  // 2. TCG Logistics (ขวาบน) - ลูกฟักทองสีส้มมีร่องเส้น + ป้ายโลโก้สีน้ำเงินตัวเอียง
+  const cx2 = .815*W, cy2 = .115*H, r2 = .095*W;
+  g.save();
+  // ลูกฟักทอง
+  g.fillStyle = '#e86a14'; g.beginPath(); g.arc(cx2, cy2, r2, 0, Math.PI*2); g.fill();
+  g.strokeStyle = '#7a3007'; g.lineWidth = 2.5; g.stroke();
+  // ร่องลูกฟักทอง
+  g.strokeStyle = '#c25308'; g.lineWidth = 2;
+  g.beginPath(); g.arc(cx2, cy2, r2*.8, Math.PI*.2, Math.PI*.8); g.stroke();
+  g.beginPath(); g.arc(cx2, cy2, r2*.8, Math.PI*1.2, Math.PI*1.8); g.stroke();
+  
+  // ป้าย TCG Logistics
+  g.fillStyle = '#0f2963'; 
+  g.beginPath(); g.roundRect ? g.roundRect(cx2 - r2*.88, cy2 - r2*.52, r2*1.76, r2*.85, 6) : g.rect(cx2 - r2*.88, cy2 - r2*.52, r2*1.76, r2*.85); 
+  g.fill();
+  g.strokeStyle = '#4da3ff'; g.lineWidth = 1.5; g.stroke();
+  
+  g.fillStyle = '#00ffff'; g.font = `900 italic ${r2*.42}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('TCG', cx2 - r2*.18, cy2 - r2*.12);
+  g.fillStyle = '#ffffff'; g.font = `700 italic ${r2*.32}px sans-serif`;
+  g.fillText('Logistics', cx2 + r2*.22, cy2 - r2*.12);
+  g.font = `400 ${r2*.17}px Kanit, sans-serif`; g.fillStyle = '#f3c969';
+  g.fillText('The name you can trust', cx2, cy2 + r2*.24);
+  g.restore();
+}
+
+function pumpkin(g, x, y, r){
+  g.save(); g.shadowColor = '#ff8a00'; g.shadowBlur = r*.8; g.fillStyle = '#e8701a';
+  g.beginPath(); g.ellipse(x, y, r*1.15, r, 0, 0, 7); g.fill(); g.shadowBlur = 0;
+  g.strokeStyle = '#a8460c'; g.lineWidth = 2; g.beginPath(); g.ellipse(x, y, r*.45, r, 0, 0, 7); g.stroke();
+  g.fillStyle = '#3d6b1f'; g.fillRect(x - r*.1, y - r*1.25, r*.2, r*.35);
+  g.restore();
+}
+
+function demoFrame(){
+  const W = 848, H = 1264, c = mk(W, H), g = c.getContext('2d');
+  const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#2a1240'); bg.addColorStop(1, '#120819');
+  g.fillStyle = bg; rrect(g, .052*W, .047*H, .897*W, .89*H, .03*W); g.fill();
+  g.lineWidth = 6; g.strokeStyle = '#c9a04a'; rrect(g, .07*W, .06*H, .86*W, .865*H, .02*W); g.stroke();
+  const ox = .505*W, oy = .365*H, rx = .3*W, ry = .215*H;
+  g.save(); g.lineWidth = 14; g.strokeStyle = '#d6a84e'; g.shadowColor = '#ff7a18'; g.shadowBlur = 25;
+  g.beginPath(); g.ellipse(ox, oy, rx + 8, ry + 8, 0, 0, 7); g.stroke(); g.restore();
+  [[.12,.22],[.12,.42],[.12,.53],[.885,.42],[.885,.53]].forEach(([x, y]) => pumpkin(g, x*W, y*H, .042*W));
+  const pa = g.createRadialGradient(.43*W, .77*H, 10, .43*W, .77*H, .36*W);
+  pa.addColorStop(0, '#f6e7c4'); pa.addColorStop(1, '#d4b47c'); g.fillStyle = pa;
+  rrect(g, .13*W, .645*H, .6*W, .255*H, 12); g.fill();
+  g.fillStyle = '#1b0d28'; g.strokeStyle = '#c9a04a'; g.lineWidth = 3;
+  rrect(g, .75*W, .6*H, .18*W, .3*H, 10); g.fill(); g.stroke();
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  ['❤️','⛈️','🧱','📦'].forEach((ic, i) => { g.font = `${.045*W}px sans-serif`; g.fillText(ic, .785*W, (L.stats.ys[i] + .012)*H); });
+  ['HP','MP','DF','IT'].forEach((t, i) => { g.font = `700 ${.022*H}px Mitr, serif`; g.fillStyle = '#f3c969'; g.fillText(t, .875*W, (L.stats.ys[i] + .03)*H); });
+  g.fillStyle = '#7b3fb0'; g.strokeStyle = '#d6a84e'; g.lineWidth = 4;
+  rrect(g, .33*W, .588*H, .35*W, .044*H, 8); g.fill(); g.stroke();
+  
+  drawLogos(g, W, H);
+
+  g.globalCompositeOperation = 'destination-out'; g.beginPath(); g.ellipse(ox, oy, rx, ry, 0, 0, 7); g.fill();
+  g.globalCompositeOperation = 'source-over';
+  return loadImg(c.toDataURL('image/png'));
+}
+
+const frameCache = {};
+function frameImg(n){
+  if(frameCache[n]) return frameCache[n];
+  if(DEMO && location.protocol === 'file:') return frameCache[n] = (n === 'base' ? demoFrame() : Promise.resolve(null));
+  return frameCache[n] = loadImg(`frames/${n}.png`).catch(() => (DEMO && n === 'base') ? demoFrame() : null);
+}
+function rrect(g, x, y, w, h, r){ g.beginPath(); g.roundRect ? g.roundRect(x, y, w, h, r) : g.rect(x, y, w, h); }
+
+/******** เสียงและเอฟเฟกต์ ********/
+let AC = null;
+function audio(){ if(!AC){ try{ AC = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){} }
+  if(AC && AC.state === 'suspended') AC.resume(); return AC; }
+function tone(freq, dur, type='sine', vol=.2, when=0, slideTo){
+  const a = audio(); if(!a) return; const t = a.currentTime + when;
+  const o = a.createOscillator(), g = a.createGain(); o.type = type; o.frequency.setValueAtTime(freq, t);
+  if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + .05);
+}
+function noise(dur, vol=.3, freq=1200){
+  const a = audio(); if(!a) return; const t = a.currentTime;
+  const b = a.createBuffer(1, Math.floor(a.sampleRate * dur), a.sampleRate), d = b.getChannelData(0);
+  for(let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  const s = a.createBufferSource(); s.buffer = b;
+  const f = a.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq;
+  const g = a.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  s.connect(f).connect(g).connect(a.destination); s.start(t);
+}
+const SFX = {
+  heartbeat(){ tone(60,.25,'sine',.5); tone(52,.3,'sine',.4,.22); },
+  tick(){ tone(900,.05,'square',.04); },
+  shutter(){ noise(.12,.5,3000); },
+  whoosh(){ noise(.9,.25,500); },
+  boom(){ tone(110,1,'sawtooth',.22,0,30); noise(.6,.4,180); },
+  reveal(r){ const n = (RAR[r] || RAR.COMMON).stars;
+    [523,659,784,1047,1319].slice(0, n + 1).forEach((f,i) => tone(f,1.5,'triangle',.12,i*.09));
+    if(r === 'LEGENDARY') tone(2093,2.2,'sine',.08,.5); }
+};
+
+/******** อนุภาคพื้นหลัง ********/
+const FX = (() => {
+  const cv = $('fx'), g = cv.getContext('2d'); let W, H, D, ps = [], type = 'ember', color = '#ff7a18';
+  function resize(){ D = Math.min(devicePixelRatio || 1, 2); W = cv.width = innerWidth * D; H = cv.height = innerHeight * D;
+    cv.style.width = innerWidth + 'px'; cv.style.height = innerHeight + 'px'; }
+  addEventListener('resize', resize); resize();
+  function spawn(burst){
+    const p = { x: burst ? W/2 : Math.random()*W, y: burst ? H*.45 : (type === 'petal' ? -20 : H + 20),
+      s: (Math.random()*3 + 1) * D, rot: Math.random()*6, vr: (Math.random() - .5) * .1, life: 1, burst };
+    if(burst){ const a = Math.random()*Math.PI*2, sp = (Math.random()*9 + 3) * D; p.vx = Math.cos(a)*sp; p.vy = Math.sin(a)*sp; p.decay = .01 + Math.random()*.01; }
+    else if(type === 'petal'){ p.vx = (Math.random() - .5) * D; p.vy = (Math.random() + .6) * D; p.decay = .002; }
+    else { p.vx = (Math.random() - .5) * .6 * D; p.vy = -(Math.random() + .3) * D; p.decay = .003 + Math.random()*.003; if(type === 'wisp') p.s *= 4; }
+    ps.push(p);
+  }
+  (function frame(){
+    g.clearRect(0, 0, W, H);
+    if(ps.length < 60 && Math.random() < .5) spawn(false);
+    g.globalCompositeOperation = 'lighter';
+    for(let i = ps.length - 1; i >= 0; i--){
+      const p = ps[i]; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life -= p.decay;
+      if(p.burst){ p.vx *= .965; p.vy *= .965; }
+      if(p.life <= 0 || p.y < -60 || p.y > H + 60){ ps.splice(i, 1); continue; }
+      g.globalAlpha = p.life * (type === 'wisp' && !p.burst ? .35 : .9); g.fillStyle = color;
+      if(type === 'petal'){ g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.beginPath(); g.ellipse(0, 0, p.s*2, p.s, 0, 0, 7); g.fill(); g.restore(); }
+      else { g.shadowBlur = 12 * D; g.shadowColor = color; g.beginPath(); g.arc(p.x, p.y, p.s, 0, 7); g.fill(); g.shadowBlur = 0; }
+    }
+    g.globalAlpha = 1; requestAnimationFrame(frame);
+  })();
+  return { set(t, c){ type = t; color = c; }, burst(n){ for(let i = 0; i < n; i++) spawn(true); } };
+})();
+function applyTheme(key){
+  const t = THEMES[key] || THEMES.classic, s = document.documentElement.style;
+  s.setProperty('--c1', t.c1); s.setProperty('--c2', t.c2); FX.set(t.p, t.c1);
+  
+  const back = $('cardBackFace');
+  if(back){
+    back.style.setProperty('--back-bg', t.bg);
+    back.style.setProperty('--back-glow', t.glow);
+  }
+  const icon = $('backIcon');
+  if(icon) icon.textContent = t.icon;
+}
+
+/******** ปลดล็อกเสียงและไจโรสโคป ********/
+let unlocked = false;
+function unlock(){
+  if(unlocked) return; unlocked = true; audio();
+  try {
+    if(window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function')
+      DeviceOrientationEvent.requestPermission().then(r => tiltOK = (r === 'granted')).catch(() => {});
+    else tiltOK = 'DeviceOrientationEvent' in window;
+  } catch(e){}
+}
+
+if(DEMO && !DEBUG){
+  $('name').value = DEMO_USER.name; $('empId').value = DEMO_USER.empId; $('consent').checked = true;
+  ['demoBadge','btnSkip','btnAgain'].forEach(id => $(id).classList.remove('hidden'));
+}
+$('btnAgain').onclick = () => location.reload();
+
+/******** 1. FORM ********/
+$('btnNext').onclick = async () => {
+  unlock();
+  const name = $('name').value.trim(), empId = $('empId').value.trim().toUpperCase();
+  $('formErr').textContent = '';
+  if(!name || !empId) return $('formErr').textContent = 'กรุณากรอกข้อมูลให้ครบ';
+  if(!/^[A-Z0-9-]{2,20}$/.test(empId)) return $('formErr').textContent = 'รหัสพนักงานไม่ถูกต้อง';
+  if(!$('consent').checked) return $('formErr').textContent = 'กรุณากดยินยอมการใช้ภาพ';
+  $('btnNext').disabled = true;
+  try {
+    const j = await api({ action:'check', empId });
+    Object.assign(state, { name, empId, names: j.names || [] });
+    if(j.registered){ applyTheme(j.card.theme); return reveal(`data:${j.cardMime};base64,${j.cardImage}`, j.card, true); }
+    show('s-camera'); startCam();
+  } catch(e){ $('formErr').textContent = e.message; }
+  finally { $('btnNext').disabled = false; }
+};
+
+/******** 2. CAMERA ********/
+async function startCam(){
+  $('camErr').textContent = '';
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user', width:{ ideal:1280 } }, audio:false });
+    $('video').srcObject = stream; await $('video').play();
+  } catch(e){ $('camErr').textContent = DEMO ? 'เปิดกล้องไม่ได้ กด "ข้ามการถ่ายรูป" หรือเลือกรูปแทน' : 'เปิดกล้องไม่ได้ กด "ใช้แอปกล้อง / เลือกรูป"'; }
+}
+function stopCam(){ if(stream){ stream.getTracks().forEach(t => t.stop()); stream = null; } }
+function toPortrait(src, sw, sh, mirror){
+  const c = mk(768, 1024), g = c.getContext('2d');
+  const tw = Math.min(sw, sh*3/4), th = tw*4/3;
+  if(mirror){ g.translate(768, 0); g.scale(-1, 1); }
+  g.drawImage(src, (sw - tw)/2, (sh - th)/2, tw, th, 0, 0, 768, 1024);
+  return c.toDataURL('image/jpeg', .88);
+}
+function setPhoto(url){
+  state.photo = url; $('preview').src = url;
+  $('preview').classList.remove('hidden'); $('video').classList.add('hidden'); $('cam').classList.add('shot');
+  $('btnShot').classList.add('hidden'); $('btnUse').classList.remove('hidden'); $('btnRetake').classList.remove('hidden');
+  $('camErr').textContent = '';
+}
+$('btnShot').onclick = async () => {
+  const v = $('video'); if(!v.videoWidth) return; $('btnShot').disabled = true;
+  for(const n of [3, 2, 1]){ const c = $('count'); c.textContent = n; c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop'); SFX.heartbeat(); buzz(40); await sleep(800); }
+  SFX.shutter(); flash(); setPhoto(toPortrait(v, v.videoWidth, v.videoHeight, true)); $('btnShot').disabled = false;
+};
+$('btnRetake').onclick = () => {
+  state.photo = null; $('preview').classList.add('hidden'); $('video').classList.remove('hidden'); $('cam').classList.remove('shot');
+  $('btnShot').classList.remove('hidden'); $('btnUse').classList.add('hidden'); $('btnRetake').classList.add('hidden');
+  if(!stream) startCam();
+};
+$('fileInput').onchange = async e => {
+  const f = e.target.files[0]; if(!f) return;
+  const img = await loadImg(URL.createObjectURL(f));
+  setPhoto(toPortrait(img, img.naturalWidth, img.naturalHeight, false));
+};
+$('btnSkip').onclick = () => { stopCam(); flash(); setPhoto(demoSilhouette()); };
+$('btnUse').onclick = generate;
+
+/******** 3. SUMMON + GENERATE ********/
+const MSGS = ['กำลังอัญเชิญวิญญาณ...','วิญญาณกำลังเลือกร่าง...','อย่าหันหลังนะ...','เสียงกระซิบเริ่มดังขึ้น...','ใกล้แล้ว...'];
+async function generate(){
+  stopCam(); $('soulImg').src = state.photo; show('s-summon'); SFX.whoosh();
+  const names = state.names.length ? state.names : ['กระสือ','ปอบ','แวมไพร์','ซอมบี้','เจียงซือ','มัมมี่'];
+  let running = true, i = Math.floor(Math.random()*names.length), mi = 0;
+  const mt = setInterval(() => $('rollSub').textContent = MSGS[++mi % MSGS.length], 3500);
+  const hb = setInterval(() => { SFX.heartbeat(); buzz(30); }, 1400);
+  const stop = () => { running = false; clearInterval(mt); clearInterval(hb); };
+  (async () => { while(running){ $('roll').textContent = names[i++ % names.length]; SFX.tick(); await sleep(90); } })();
+  try {
+    const j = await api({ action:'generate', empId:state.empId, name:state.name, photo:state.photo.split(',')[1] });
+    const cardP = composeCard(`data:${j.aiMime};base64,${j.aiImage}`, j.card);
+    stop();
+    for(let k = 0; k < 12; k++){ $('roll').textContent = names[i++ % names.length]; SFX.tick(); await sleep(80 + k*k*7); }
+    $('roll').textContent = j.card.charName; $('rollSub').textContent = 'วิญญาณตอบรับแล้ว!';
+    applyTheme(j.card.theme); SFX.boom(); buzz([60,40,140]);
+    document.body.classList.add('shake'); await sleep(700); document.body.classList.remove('shake');
+    const url = await cardP;
+    await reveal(url, j.card, false);
+    saveInBackground(url);
+  } catch(e){
+    stop(); show('s-camera'); $('camErr').textContent = e.message + ' — กด "ใช้รูปนี้" เพื่อลองใหม่';
+  }
+}
+async function saveInBackground(url){
+  $('saveStatus').textContent = 'กำลังบันทึกเข้าระบบ...';
+  for(let k = 0; k < 3; k++){
+    try { await api({ action:'saveCard', empId:state.empId, card:url.split(',')[1] });
+          $('saveStatus').textContent = DEMO ? 'โหมดทดลอง: ยังไม่ได้บันทึกลง Google Sheet' : 'บันทึกเรียบร้อย คุณมีสิทธิ์ลุ้นรางวัลแล้ว'; return; }
+    catch(e){ await sleep(2000); }
+  }
+  $('saveStatus').textContent = 'บันทึกไม่สำเร็จ กรุณาแคปหน้าจอแล้วแจ้งเจ้าหน้าที่';
+}
+
+/******** 4. COMPOSE CARD ********/
+function drawCover(g, img, x, y, w, h){
+  const s = Math.max(w/img.naturalWidth, h/img.naturalHeight), iw = img.naturalWidth*s, ih = img.naturalHeight*s;
+  g.drawImage(img, x + (w - iw)/2, y + (h - ih)/2.4, iw, ih);
+}
+function fitText(g, text, cx, cy, maxW, size, font, fill, stroke){
+  let s = size; g.font = `${font.w} ${s}px ${font.f}`;
+  while(g.measureText(text).width > maxW && s > 10){ s--; g.font = `${font.w} ${s}px ${font.f}`; }
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  if(stroke){ g.lineWidth = s*.2; g.strokeStyle = stroke; g.lineJoin = 'round'; g.strokeText(text, cx, cy); }
+  g.fillStyle = fill; g.fillText(text, cx, cy);
+}
+function wrapThai(g, text, maxW){
+  const segs = window.Intl && Intl.Segmenter
+    ? [...new Intl.Segmenter('th', { granularity:'word' }).segment(text)].map(s => s.segment) : [...text];
+  const lines = []; let line = '';
+  for(const s of segs){ if(g.measureText(line + s).width > maxW && line){ lines.push(line); line = s.trimStart(); } else line += s; }
+  if(line) lines.push(line); return lines;
+}
+
+async function composeCard(aiSrc, card){
+  await Promise.all([document.fonts.load('700 40px Mitr'), document.fonts.load('400 20px Kanit')]).catch(() => {});
+  const [base, themed, ai] = await Promise.all([frameImg('base'), frameImg(card.theme), loadImg(aiSrc)]);
+  if(!base) throw new Error('โหลดเฟรมไม่สำเร็จ');
+  const W = base.naturalWidth, H = base.naturalHeight, r = RAR[card.rarity] || RAR.COMMON;
+
+  const pl = mk(W, H), pg = pl.getContext('2d');
+  drawCover(pg, ai, L.photo.x*W, L.photo.y*H, L.photo.w*W, L.photo.h*H);
+  pg.globalCompositeOperation = 'destination-out'; pg.drawImage(base, 0, 0, W, H);
+
+  const cv = mk(W, H), g = cv.getContext('2d');
+  g.drawImage(themed || base, 0, 0, W, H);
+  g.drawImage(pl, 0, 0);
+
+  drawLogos(g, W, H);
+
+  const M = { w:700, f:'Mitr' }, P = L.parch, cx = P.cx*W, mw = P.maxW*W;
+  fitText(g, card.charName, L.ribbon.cx*W, L.ribbon.cy*H, L.ribbon.maxW*W, L.ribbon.size*H, M, '#fff4d6', '#2a0f3d');
+  fitText(g, `${'★'.repeat(r.stars)}  ${r.label}`, cx, P.y[0]*H, mw, .022*H, M, r.ink);
+  
+  g.font = `400 ${.022*H}px Kanit`; g.fillStyle = '#4a2a14'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  wrapThai(g, card.description || '', P.descW*W).slice(0, 2).forEach((ln, i) => g.fillText(ln, cx, (P.y[1] + i*.032)*H));
+
+  fitText(g, `LV. ${card.lv}`, L.lv.x*W, L.lv.y*H, L.lv.maxW*W, L.lv.size*H, M, '#ffcf5a', '#3a1600');
+  [card.hp, card.mp, card.df, card.it].forEach((v, i) =>
+    fitText(g, String(v), L.stats.x*W, L.stats.ys[i]*H, L.stats.maxW*W, L.stats.size*H, M, '#ffcf5a', '#3a1600'));
+
+  const b = L.card, out = mk(b.w*W, b.h*H), og = out.getContext('2d');
+  rrect(og, 0, 0, out.width, out.height, b.r*W); og.clip();
+  og.drawImage(cv, -b.x*W, -b.y*H);
+  if(card.rarity === 'EPIC' || card.rarity === 'LEGENDARY'){
+    og.lineWidth = W*.012; og.strokeStyle = r.color; og.shadowColor = r.color; og.shadowBlur = W*.03;
+    rrect(og, 0, 0, out.width, out.height, b.r*W); og.stroke();
+  }
+  return out.toDataURL('image/png');
+}
+
+/******** 5. REVEAL ********/
+async function reveal(url, card, old){
+  const r = RAR[card.rarity] || RAR.COMMON, stage = $('stage'), flip = $('flip');
+  document.documentElement.style.setProperty('--rc', r.color);
+  applyTheme(card.theme);
+  
+  $('cardFront').src = url; try { await $('cardFront').decode(); } catch(e){}
+  stage.className = 'stage r-' + (card.rarity || 'COMMON').toLowerCase();
+  flip.classList.remove('flipped'); $('statWrap').classList.remove('show');
+  $('resTitle').textContent = old ? 'การ์ดของคุณ' : 'วิญญาณของคุณคือ...';
+  $('resName').textContent = old ? card.charName : '???';
+  $('rarity').textContent = '★'.repeat(r.stars) + '  ' + r.label; $('rarity').classList.toggle('hidden', !old);
+  setupDownload(url, card.empId);
+  setupShare(url, card.empId);
+  $('saveStatus').textContent = old ? 'ข้อมูลของคุณอยู่ในระบบแล้ว' : '';
+  show('s-result');
+
+  if(old){ flip.classList.add('flipped'); stage.classList.add('revealed'); renderStats(card, true); $('tapHint').classList.add('show'); return; }
+
+  $('tapHint').classList.add('show');
+  await new Promise(res => { const go = () => { flip.removeEventListener('click', go); res(); }; flip.addEventListener('click', go); setTimeout(go, 5000); });
+  
+  flip.classList.add('flipped'); SFX.reveal(card.rarity); buzz([80,40,200]);
+  setTimeout(() => {
+    flash(); FX.burst({ COMMON:60, RARE:110, EPIC:180, LEGENDARY:320 }[card.rarity] || 60);
+    stage.classList.add('revealed'); $('resName').textContent = card.charName; $('rarity').classList.remove('hidden');
+  }, 450);
+  setTimeout(() => renderStats(card, false), 1100);
+
+  flip.onclick = () => { flip.classList.toggle('flipped'); audio(); };
+}
+
+function renderStats(card, instant){
+  const items = [['HP',card.hp,'#ff5a6a'],['MP',card.mp,'#6ab8ff'],['DF',card.df,'#e0a050'],['IT',card.it,'#ffe27a']];
+  const box = $('stats'); box.classList.remove('on');
+  box.innerHTML = items.map(([k,v,c]) => `<div class="st"><b>${k}</b><div class="bar"><i style="--w:${Math.min(v,100)}%;--bc:${c}"></i></div><span data-v="${v}">0</span></div>`).join('');
+  $('statWrap').classList.add('show');
+  setTimeout(() => box.classList.add('on'), 60);
+  box.querySelectorAll('span').forEach(s => countUp(s, +s.dataset.v, instant ? 0 : 1200));
+  countUp($('lvNum'), +card.lv, instant ? 0 : 1200);
+}
+function countUp(el, to, ms){
+  if(!ms){ el.textContent = to; return; }
+  const t0 = performance.now();
+  (function f(t){ const p = Math.min(1, (t - t0)/ms); el.textContent = Math.round(to*(1 - Math.pow(1 - p, 3))); if(p < 1) requestAnimationFrame(f); })(t0);
+}
+
+/******** ดาวน์โหลด + แชร์ ********/
+let cardBlobUrl = null;
+const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+async function setupDownload(url, emp){
+  const a = $('btnDownload'), fname = `BOO-Party-Night_${emp}.png`;
+  a.href = url; a.download = fname;
+  try {
+    const blob = await (await fetch(url)).blob();
+    if(cardBlobUrl) URL.revokeObjectURL(cardBlobUrl);
+    cardBlobUrl = URL.createObjectURL(blob); a.href = cardBlobUrl;
+    a.onclick = async e => {
+      if(!isIOS || !navigator.canShare) return;
+      const file = new File([blob], fname, { type:'image/png' });
+      if(navigator.canShare({ files:[file] })){ e.preventDefault(); try { await navigator.share({ files:[file] }); } catch(_){} }
+    };
+  } catch(e){}
+}
+function setupShare(url, emp){
+  const b = $('btnShare'); if(!navigator.canShare){ b.classList.add('hidden'); return; }
+  b.classList.remove('hidden');
+  b.onclick = async () => { try {
+    const blob = await (await fetch(url)).blob();
+    const file = new File([blob], `BOO-Party-Night_${emp}.png`, { type:'image/png' });
+    if(navigator.canShare({ files:[file] })) await navigator.share({ files:[file], title:'My BOO! Party Night Card' });
+  } catch(e){} };
+}
+
+/******** เอียงการ์ด 3D ********/
+const card3d = $('card3d');
+function setTilt(x, y){ const s = card3d.style;
+  s.setProperty('--rx', (-y*12) + 'deg'); s.setProperty('--ry', (x*14) + 'deg');
+  s.setProperty('--px', (50 + x*50) + '%'); s.setProperty('--py', (50 + y*50) + '%'); }
+card3d.addEventListener('pointermove', e => { const b = card3d.getBoundingClientRect();
+  setTilt((e.clientX - b.left)/b.width*2 - 1, (e.clientY - b.top)/b.height*2 - 1); });
+card3d.addEventListener('pointerleave', () => setTilt(0, 0));
+addEventListener('deviceorientation', e => { if(!tiltOK || e.gamma == null) return;
+  setTilt(Math.max(-1, Math.min(1, e.gamma/25)), Math.max(-1, Math.min(1, (e.beta - 45)/25))); });
+</script>
+</body>
+</html>
